@@ -1,0 +1,27 @@
+[project]
+name = "mon-projet-pilote"
+version = "0.1.0"
+description = "Il s'agit d'un projet permettant de prendre la main sur langgraph"
+authors = [
+    {name = "Vanel SIYOU FOTSO",email = "vanel.siyou.ext@aheaddigital.com"}
+]
+readme = "README.md"
+requires-python = "<4.0, >=3.12"
+dependencies = [
+    "langgraph (>=0.3.5,<0.4.0)",
+    "langchain (>=0.3.20,<0.4.0)",
+    "openai (>=1.65.5,<2.0.0)",
+    "python-dotenv (>=1.0.1,<2.0.0)",
+    "langchain-openai (>=0.3.8,<0.4.0)",
+    "langchain-google-genai (>=2.0.11,<3.0.0)",
+    "requests (>=2.32.3,<3.0.0)",
+    "pytest (>=8.3.5,<9.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "mon_projet_pilote", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
