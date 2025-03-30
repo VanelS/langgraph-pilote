@@ -168,7 +168,8 @@ def appeler_météo(state: AgentState) -> Dict[str, Any]:
         }
         
     try:
-        observation = recherche_météo.invoke(state["tool_input"])
+        # Appeler la fonction recherche_météo directement
+        observation = recherche_météo(state["tool_input"])
         logger.info(f"Résultat météo obtenu: {observation}")
         return {"observation": observation}
     except ToolExecutionError as e:
@@ -197,7 +198,8 @@ def appeler_calculatrice(state: AgentState) -> Dict[str, Any]:
         }
         
     try:
-        observation = calculatrice.invoke(state["tool_input"])
+        # Appeler la fonction calculatrice directement
+        observation = calculatrice(state["tool_input"])
         logger.info(f"Résultat calculatrice obtenu: {observation}")
         return {"observation": observation}
     except ToolExecutionError as e:

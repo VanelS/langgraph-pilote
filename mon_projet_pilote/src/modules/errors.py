@@ -53,6 +53,9 @@ def handle_tool_errors(fallback_response: str = "Une erreur s'est produite lors 
         Fonction décorée avec gestion d'erreurs
     """
     def decorator(func: F) -> F:
+        # Pour les outils LangChain, on retourne une nouvelle fonction au lieu de wrapper
+        # afin d'éviter les problèmes avec l'avertissement de dépréciation de BaseTool.__call__
+        # La fonction originale devrait toujours être utilisée, cette fonction n'est qu'une couche de sécurité
         def wrapper(*args, **kwargs) -> Any:
             try:
                 return func(*args, **kwargs)
@@ -63,6 +66,12 @@ def handle_tool_errors(fallback_response: str = "Une erreur s'est produite lors 
                 raise ToolExecutionError(
                     f"{fallback_response} (ID: {error_id})"
                 ) from e
+        
+        # Copier les attributs importants
+        wrapper.__name__ = func.__name__
+        wrapper.__doc__ = func.__doc__
+        wrapper.__annotations__ = func.__annotations__
+        
         return wrapper
     return decorator
 
@@ -106,6 +115,12 @@ def validate_input(validation_func: Callable[[Any], bool], error_message: str = 
                 logger.warning(f"Validation d'entrée échouée pour {func.__name__}: {input_value}")
                 raise InputValidationError(error_message)
             return func(input_value, *args, **kwargs)
+        
+        # Préserver les métadonnées
+        wrapper.__name__ = func.__name__
+        wrapper.__doc__ = func.__doc__
+        wrapper.__annotations__ = func.__annotations__
+        
         return wrapper
     return decorator
 

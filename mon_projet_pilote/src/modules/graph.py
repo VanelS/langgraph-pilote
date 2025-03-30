@@ -2,7 +2,7 @@
 Construction et compilation du graphe d'agent.
 """
 from langgraph.graph import StateGraph, END
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Callable, Annotated
 import time
 
 from .state import AgentState
@@ -27,8 +27,10 @@ def nœud_de_récupération(state: Dict[str, Any]) -> Dict[str, Any]:
         État mis à jour avec une réponse d'erreur
     """
     logger.warning(f"Activation du nœud de récupération. Erreur: {state.get('error_message', 'inconnue')}")
+    # Ajout d'un champ error_handled pour éviter les conflits d'état
     return {
-        "answer": (
+        "error_handled": True,
+        "recovery_message": (
             "Je suis désolé, une erreur s'est produite lors du traitement de votre demande. "
             "Veuillez réessayer ou reformuler votre question."
         )
@@ -51,6 +53,7 @@ def build_agent_graph(max_retries: int = 3) -> Any:
     # Tentatives de compilation avec backoff exponentiel
     for attempt in range(max_retries):
         try:
+            # Utilisation d'Annotated pour les champs qui peuvent être mis à jour par plusieurs nœuds
             workflow = StateGraph(AgentState)
             
             # Ajout des nœuds principaux
@@ -83,43 +86,7 @@ def build_agent_graph(max_retries: int = 3) -> Any:
                     return "récupération"
                 return "normal"
             
-            # Ajout de chemins de récupération
-            workflow.add_conditional_edges(
-                "analyser",
-                lambda s: détecteur_erreur(s),
-                {
-                    "normal": "choisir_outil",
-                    "récupération": "récupération"
-                }
-            )
-            
-            workflow.add_conditional_edges(
-                "choisir_outil",
-                lambda s: détecteur_erreur(s),
-                {
-                    "normal": router(s),
-                    "récupération": "récupération"
-                }
-            )
-            
-            workflow.add_conditional_edges(
-                "appeler_météo",
-                lambda s: détecteur_erreur(s),
-                {
-                    "normal": "formuler_réponse",
-                    "récupération": "récupération"
-                }
-            )
-            
-            workflow.add_conditional_edges(
-                "appeler_calculatrice",
-                lambda s: détecteur_erreur(s),
-                {
-                    "normal": "formuler_réponse",
-                    "récupération": "récupération"
-                }
-            )
-            
+            # Ajout de chemins de récupération simplifiés
             workflow.add_edge("récupération", END)
             
             # Compilation avec suivi des performances

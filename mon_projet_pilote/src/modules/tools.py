@@ -32,9 +32,9 @@ def is_valid_expression(expression: str) -> bool:
     # Vérification basique que l'expression ne contient que des caractères autorisés
     return bool(expression) and bool(re.match(r'^[\d\s\+\-\*\/\(\)\.\,\%]+$', expression))
 
-@tool
-@handle_tool_errors(fallback_response="Je n'ai pas pu obtenir les informations météo.")
 @validate_input(is_valid_location, "Le nom de ville fourni n'est pas valide.")
+@handle_tool_errors(fallback_response="Je n'ai pas pu obtenir les informations météo.")
+@tool
 def recherche_météo(location: str) -> str:
     """Recherche la météo pour une ville donnée en utilisant l'API Open-Meteo (sans clé API nécessaire)"""
     logger.info(f"Recherche météo pour: {location}")
@@ -130,9 +130,9 @@ def recherche_météo(location: str) -> str:
         logger.error(f"Erreur inattendue dans recherche_météo: {str(e)}")
         raise
 
-@tool
-@handle_tool_errors(fallback_response="Je n'ai pas pu calculer cette expression.")
 @validate_input(is_valid_expression, "L'expression mathématique fournie n'est pas valide.")
+@handle_tool_errors(fallback_response="Je n'ai pas pu calculer cette expression.")
+@tool
 def calculatrice(expression: str) -> str:
     """Calcule une expression mathématique"""
     logger.info(f"Calcul de l'expression: {expression}")
